@@ -6,7 +6,7 @@ Group project written in LC3. This program takes in 5 test scores  (0-99) and re
 # Why the project is useful:
 Test Score Calculator is useful for students when they need help calculating their average test scores and managing their grade.
 
-# How users can get started with the project
+# How users can get started with the project:
 To get started assemble the Test_Score_Calculator.asm file using the LC3 Editor. Start the LC3 simulator and open the newly created .obj file and press play.
 
 # Help with this project :
