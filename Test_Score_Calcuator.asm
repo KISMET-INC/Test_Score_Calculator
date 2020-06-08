@@ -233,7 +233,7 @@ MAX_GRADE		.BLKW 1
 MIN_GRADE		.BLKW 1
 DONE_AVG		.BLKW 1
 AVERAGE_SCORE		.BLKW 1
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 NEXT2 
 	LDR R4, R2, #0
@@ -257,8 +257,6 @@ MAX	.STRINGZ "MAX "
 AVG	.STRINGZ "AVG "
 
 ;/////////// END MAIN ///////////;
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; GET_GRADE
@@ -434,7 +432,7 @@ STACK_ERROR	LEA R0, ERROR
 		HALT
 
 BASELINE 	.FILL xC000
-ERROR		.STRINGZ "STACK UNDERFLOW OR UNDERFLOW. HALTING PROGRAM"
+ERROR		.STRINGZ "STACK UNDERFLOW OR OVERFLOW. HALTING PROGRAM"
 
 ;/////////// END POP ///////////;
 
