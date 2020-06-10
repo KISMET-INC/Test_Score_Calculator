@@ -6,6 +6,8 @@
 ; THIS CODE WILL TAKE THE MIN, MAX, AND AVERAGE OF 5 INPUTS
 ; THE CODE WILL ALSO DISPLAY THE MAXIMUM, MINIMUM AND THE AVERAGE
 ; ALONG WITH THE EQUIVALENT LETTER GRADE
+;
+
 
 .ORIG x3000
 
@@ -13,7 +15,7 @@
 
 LEA	 R0, WEL
 PUTS 
-WEL	.STRINGZ "Enter 5 scores:"
+WEL	.STRINGZ "Enter 5 scores: (0 - 99)"
 
 LD R0, NEWLINE
 OUT
@@ -84,7 +86,7 @@ JSR POP
 LD R0, NEWLINE
 OUT
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		   ; FALL THRU FUNCTION IN MAIN
 ; CALCULATE MAX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; R1 = NUM_TESTS (5)
@@ -119,7 +121,10 @@ LD R0, NEWLINE
 OUT	
 JSR CLEAR_REG
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;/////////// END CALCULATE MAX ///////////;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		; FALL THRU FUNCTION IN MAIN
 ; CALCULATE MIN
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; R1 = NUM_TESTS (5)
@@ -141,7 +146,7 @@ CALCULATE_MIN
 LOOP2 	LDR R5, R2, #0		; ACCESS POINTER VALUE IN GRADES
 	
 	NOT R4, R4
-	ADD R4, R4, #1
+	ADD R4, R4, #1		
 	ADD R5, R5, R4
 	BRn NEXT2
 
@@ -164,8 +169,13 @@ JSR CLEAR_REG
 LD R0, NEWLINE
 OUT
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; CALCULATE AVERAGE
+
+;/////////// END CALCULATE MIN ///////////;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		   ; FALL THRU FUNCTION IN MAIN
+; CALCULATE AVG
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; R1 = NUM_TESTS (5) 
 ; R2 = GRADES ARRAY
@@ -205,22 +215,25 @@ DONE_AVE
 	AND R4, R4, #0
 	ADD R3, R3, R6
 	JSR BREAK_INT
+
+;/////////// END CALCULATE AVERAGE ///////////;
+
 		
+JSR RESTART_PROG
 
 HALT
 
 ;/////////// END MAIN ///////////;
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; GLOBAL VARIABLES
+; GLOBAL VARIABLES 1
+; BROKEN UP TO FIT WITHIN 9
+; BITS OF USE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SAVELOC1 .FILL X0
-SAVELOC2 .FILL X0
-SAVELOC3 .FILL X0
-SAVELOC4 .FILL X0
-SAVELOC5 .FILL X0
+
 
 NEWLINE			.FILL xA
 SPACE			.FILL X20
@@ -228,11 +241,18 @@ DECODE_DEC 		.FILL #-48
 DECODE_SYM		.FILL #48
 DECODE_THIRTY		.FILL #-30
 NUM_TESTS		.FILL 5
+RESTART2		.FILL x3000
 
 MAX_GRADE		.BLKW 1
 MIN_GRADE		.BLKW 1
 DONE_AVG		.BLKW 1
 AVERAGE_SCORE		.BLKW 1
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BRANCHES AND VARIALBLES
+; FOR CALCULATE MIN AND MAX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 NEXT2 
@@ -256,9 +276,80 @@ MIN	.STRINGZ "MIN "
 MAX	.STRINGZ "MAX "
 AVG	.STRINGZ "AVG "
 
-;/////////// END MAIN ///////////;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;			; SUBROUTINE
+; RESTART_PROG
+; RESTARTS THE PROGRAM ON 'y'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; R7 = JSR LOCATION
+; R0 = INPUT/ OUTPUT
+; R1 = VALUE OF LOWERCASE Y(- 121)
+; R2 = ORIGIN x3000
+; R3 = VALUE OF UPPERCASE Y (-89)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+
+RESTART_PROG
+	ST R7, SAVELOC1			; SAVE JSR LOCATION
+	LD R1, LOWER_Y			; LOAD NEG VALUE OF Y
+	LD R3, UPPER_Y
+	LD R2, ORIGIN			; LOAD ORIGIN ( x3000)
+	
+	LD R0, NEWLINE
+	OUT
+	LEA R0 RESTARTPROG_STR		; RESTART PROMPT STRING
+	PUTS
+	LD R0, NEWLINE
+	OUT
+
+	GETC	
+	ADD R1, R1, R0			; COMPARE USER INPUT WITH -y
+	BRz RESTART_TRUE 		; IF TRUE BRANCH TO RESTART
+	ADD R3, R3, R0			; COMPARE USER INPUT WITH -Y
+	BRz RESTART_TRUE 		; IF TRUE BRANCH TO RESTART
+
+HALT					; ELSE HALT PROGRAM
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BRANCHES OR
+; RESTART_PROG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+RESTART_TRUE	
+	JMP R2
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; VARIABLES FOR
+; RESTART_PROG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+RESTARTPROG_STR 	.STRINGZ "PROGRAM FINISHED, DO YOU WANT TO RUN THIS PROGRAM AGAIN? Y/N (lowercase)"
+LOWER_Y			.FILL xFF87	; -121
+UPPER_Y			.FILL xFFA7	; -89
+ORIGIN			.FILL x3000
+
+
+
+;/////////// END RESTART PROG ///////////;
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; GLOBAL VARIABLES 2
+; BROKEN UP TO FIT WITHIN 9
+; BITS OF USE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SAVELOC1 .FILL X0
+SAVELOC2 .FILL X0
+SAVELOC3 .FILL X0
+SAVELOC4 .FILL X0
+SAVELOC5 .FILL X0
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		; SUBROUTINE
 ; GET_GRADE
 ; READ IN TWO NUMBERS AND PUT
 ; TOGETHER AS ONE DOUBLE DIGIT
@@ -315,7 +406,7 @@ RET					; RETURN
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		; SUBROUTINE
 ; BREAK _ INT 
 ; BREAKS UP A DOUBLE DIGIT INTO
 ; TWO SEPERATE DIGITS FOR 
@@ -368,7 +459,9 @@ Q .FILL X0
 
 ;/////////// END BREAK_INT ///////////;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		; SUBROUTINE
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;				; SUBROUTINE
 ; PUSH
 ; TAKE IN A NUMBER IN R0
 ; AND STORE IT TO A STACK
@@ -395,7 +488,7 @@ POINTER	.FILL X4000		; POINTER START LOCATION
 ;/////////// END PUSH ///////////;
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		; SUBROUTINE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;				; SUBROUTINE
 ; POP
 ; REMOVE A NUMBER FROM THE STACK
 ; AND STORE IN R0
@@ -432,12 +525,12 @@ STACK_ERROR	LEA R0, ERROR
 		HALT
 
 BASELINE 	.FILL xC000
-ERROR		.STRINGZ "STACK UNDERFLOW OR OVERFLOW. HALTING PROGRAM"
+ERROR		.STRINGZ "STACK UNDERFLOW OR UNDERFLOW. HALTING PROGRAM"
 
 ;/////////// END POP ///////////;
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;			; SUBROUTINE
 ; GET_LETTER
 ; TAKES A TWO DIGIT GRADE
 ; AND RETURNS A CORRESPONDING
@@ -515,7 +608,7 @@ F_LET	.FILL X46
 ;/////////// END GET_LETTER ///////////;
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;					; SUBROUTINE
 ; CLEAR_REG
 ; CLEAR REGISTERS 1 - 6
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -530,14 +623,14 @@ RET
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;				; SUBROUTINE
 ; VALIDA
 ; (DATA VALIDATION)
 ; CHECKS THE INPUT FOR A NUMBER
 ; IF NOT A NUMBER RESTARTS PROGRAM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; R1 = -48
-; R2 = -57
+; R1 = -48  (START OF NUMBERS)
+; R2 = -57  (END OF NUMBERS)
 ; R0 = INPUT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -559,6 +652,11 @@ VALIDA	ST R1, SAVELOC5		; STORE VARIABLES
 
 	RET
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BRANCHES AND VARIABLES FOR
+; VALIDA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 FAIL 	LEA R0, FAIL_STR	; FAIL BRANCH
 	PUTS
 	LD R0, NEWLINE2
@@ -576,4 +674,5 @@ NEWLINE2	.FILL XA
 ;/////////// END VALIDA ///////////;
 
 .END
+
 ;/////////// END PROGRAM ///////////;
